@@ -1,13 +1,6 @@
 function getRandomVal(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
-function gameWinner(winner) {
-	// if(winner === 'player') {
-	// 	alert('Player won!');
-	// } else if (winner === 'monster') {
-	// 	// alert('Monster won!');
-	// }
-}
 
 const app = Vue.createApp({
 	data() {
@@ -21,15 +14,24 @@ const app = Vue.createApp({
 		};
 	},
 	methods: {
+		startGame() {
+			this.playerHealth = 100;
+			this.monsterHealth = 100;
+			this.winner = null;
+			this.atkCounter = 0;
+			this.battleLog = [];
+		},
 		attackMonster() {
 			const attackVal = getRandomVal(5, 12);
 			this.monsterHealth -= attackVal;
+			this.addLogMessage('player', 'attack', attackVal)
 			this.attackPlayer();
 		},
 		attackPlayer() {
 			const attackVal = getRandomVal(8, 15);
 			this.playerHealth -= attackVal;
 			this.playerSpecialAtkBuildUp();
+			this.addLogMessage('monster', 'attack', attackVal)
 		},
 		heal() {
 			const healVal = getRandomVal(8, 20);
@@ -39,6 +41,7 @@ const app = Vue.createApp({
 			} else {
 				this.playerHealth += healVal;
 			}
+			this.addLogMessage('player', 'heal', healVal)
 			this.attackPlayer();
 		},
 		specialAttack() {
@@ -46,6 +49,7 @@ const app = Vue.createApp({
 			this.monsterHealth -= specialAtkVal;
 			this.specialAtkAvailable = true;
 			this.attackPlayer();
+			this.addLogMessage('player', 'special attack', specialAtkVal)
 			this.atkCounter = 0;
 		},
 		playerSpecialAtkBuildUp() {
@@ -54,6 +58,17 @@ const app = Vue.createApp({
 				this.specialAtkAvailable = false;
 				console.log('specialAtkAvailable is ', this.specialAtkAvailable);
 			}
+		},
+		surrender() {
+			this.winner = 'monster'
+		},
+		addLogMessage(who, what, value) {
+			this.battleLog.unshift({
+				actionBy: who,
+				actionType: what,
+				actionValue: value,
+			});
+			console.log('battleLog == ', this.battleLog)
 		},
 	},
 	computed: {
