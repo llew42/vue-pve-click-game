@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vue Basics</title>
+    <title>Vue Build - Monster Slayer</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap"
       rel="stylesheet"
@@ -20,24 +20,41 @@
       <section id="monster" class="container">
         <h2>Monster Health</h2>
         <div class="healthbar">
-          <div class="healthbar__value"></div>
+          <div class="healthbar__value" :style="monsterHealthBar"></div>
         </div>
       </section>
       <section id="player" class="container">
         <h2>Your Health</h2>
         <div class="healthbar">
-          <div class="healthbar__value"></div>
+          <div class="healthbar__value" :style="playerHealthBar"></div>
         </div>
       </section>
-      <section id="controls">
-        <button>ATTACK</button>
-        <button>SPECIAL ATTACK</button>
-        <button>HEAL</button>
-        <button>SURRENDER</button>
+      <section class="container" v-if="winner">
+        <h2>Game Over!</h2>
+        <h3 v-if="winner === 'monster'">You Lost!</h3>
+        <h3 v-else-if="winner === 'player'">You Won!</h3>
+        <h3 v-else>Draw</h3>
+        <button @click="startGame">Start New Game</button>
+      </section>
+      <section id="controls" v-else>
+        <button @click="attackMonster">ATTACK</button>
+        <button @click="specialAttack" :disabled="mayUseSpecialAtk">SPECIAL ATTACK</button>
+        <button @click="heal">HEAL</button>
+        <button @click="surrender">SURRENDER</button>
       </section>
       <section id="log" class="container">
         <h2>Battle Log</h2>
-        <ul></ul>
+        <ul>
+          <li v-for="(battle, idx) in battleLog">
+            <span>{{idx}}. </span> 
+            <span :class="{'log--player': battle.actionBy === 'player', 'log--monster': battle.actionBy === 'monster'}">{{battle.actionBy === 'player' ? 'Player ' : 'Monster '}}</span>
+            <span v-if="battle.actionType === 'heal'"><span class="log--heal"> heals himself for </span>{{battle.actionValue}} points</span>
+            <span v-else> {{battle.actionType}}s and deals 
+              <span class="log--damage">{{battle.actionValue}} points of damage</span>
+            </span>
+
+          </li>
+        </ul>
       </section>
     </div>
   </body>
